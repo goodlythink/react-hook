@@ -4,12 +4,13 @@ const App = () => {
   const [news, setNews] = useState([])
   const [searchQuery, setSearchQuery] = useState('batman')
   const [url, setUrl] = useState("http://hn.algolia.com/api/v1/search?query=batman")
+  const [loading, setLoading] = useState(false)
 
   const fetchNews = () => {
+    setLoading(true)
     fetch(url)
       .then(result => result.json())
-      // .then(data=>console.log(data.hits))
-      .then(data => setNews(data.hits))
+      .then(data => (setNews(data.hits), setLoading(false)))
       .catch(error => console.log(error))
   }
 
@@ -26,15 +27,27 @@ const App = () => {
     setUrl(`http://hn.algolia.com/api/v1/search?query=${searchQuery}`)
   }
 
+  const searchForm = () => (
+    <form>
+      <input type="text" value={searchQuery} onChange={handleChange} />
+      <button onClick={handleSubmit}>Seach</button>
+    </form>
+  )
+
+  const showLoading = () => (
+    loading ? <h2>Loading...</h2> : ''
+  )
+
+  const showData = () => (
+    news.map((n, i) => (<p key={i}>{n.title}</p>))
+  )
+
   return (
     <div>
       <h2>This is News</h2>
-      <form>
-        <input type="text" value={searchQuery} onChange={handleChange} />
-        <button onClick={handleSubmit}>Seach</button>
-      </form>
-
-      {news.map((n, i) => (<p key={i}>{n.title}</p>))}
+      {showLoading()}
+      {searchForm()}
+      {showData()}
     </div >
   )
 }
